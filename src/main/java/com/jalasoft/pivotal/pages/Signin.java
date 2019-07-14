@@ -5,43 +5,33 @@ import java.util.concurrent.TimeUnit;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class Signin {
+public class Signin extends AbstractPage {
 
-    private WebDriver driver;
-    private WebDriverWait wait;
+    @FindBy(css = "#credentials_username")
+    private WebElement userNameTextField;
+
+    @FindBy(css = "#credentials_password")
+    private WebElement passwordTextField;
+
+    @FindBy(css = ".app_signin_action_button")
+    private WebElement loginButton;
 
     public Signin() {
-        WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-        wait = new WebDriverWait(driver, 30);
-
-        driver.manage().window().maximize();
         driver.get("https://www.pivotaltracker.com/signin?source=navbar");
     }
 
-    public void setUserName(String userName) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".app_signin_credentials_box + .app_signin_credentials_box ")));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#credentials_username")));
-        driver.findElement(By.cssSelector("#credentials_username")).sendKeys(userName);
-    }
-
-    public void clickNextButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".app_signin_action_button")));
-        driver.findElement(By.cssSelector(".app_signin_action_button")).click();
-    }
-
-    public void setPassword(String password) {
-        driver.findElement(By.cssSelector("#credentials_password")).sendKeys(password);
-    }
-
-    public Header clickLoginButton() {
-        driver.findElement(By.cssSelector(".app_signin_action_button")).click();
+    public Header loginAs(String userName, String password) {
+        action.setValue(userNameTextField, userName);
+        action.click(loginButton);
+        action.setValue(passwordTextField, password);
+        action.click(loginButton);
         return new Header(driver);
     }
 }
